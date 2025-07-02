@@ -185,12 +185,7 @@ fun getApplicationSignature(context: Context, packageName: String): List<String>
     return emptyList()
 }
 
-        return signatureList
-    } catch (e: Exception) {
-        // Handle error
-    }
-    return emptyList()
-}
+    
 
 fun bytesToHex(bytes: ByteArray): String {
     val hexArray = charArrayOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F')
