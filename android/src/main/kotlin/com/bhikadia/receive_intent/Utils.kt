@@ -153,21 +153,17 @@ fun toJSONArray(array: Any): JSONArray? {
 }
 
 fun getApplicationSignature(context: Context, packageName: String): List<String> {
-    val signatureList: List<String>
     try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            // New signature
             val sig = context.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNING_CERTIFICATES).signingInfo
                 ?: throw IllegalStateException("no signature found")
-            signatureList = if (sig.hasMultipleSigners()) {
-                // Send all with apkContentsSigners
+            return if (sig.hasMultipleSigners()) {
                 sig.apkContentsSigners.map {
                     val digest = MessageDigest.getInstance("SHA-256")
                     digest.update(it.toByteArray())
                     bytesToHex(digest.digest())
                 }
             } else {
-                // Send one with signingCertificateHistory
                 sig.signingCertificateHistory.map {
                     val digest = MessageDigest.getInstance("SHA-256")
                     digest.update(it.toByteArray())
@@ -177,12 +173,17 @@ fun getApplicationSignature(context: Context, packageName: String): List<String>
         } else {
             val sig = context.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES).signatures
                 ?: throw IllegalStateException("no signature found")
-            signatureList = sig.map {
+            return sig.map {
                 val digest = MessageDigest.getInstance("SHA-256")
                 digest.update(it.toByteArray())
                 bytesToHex(digest.digest())
             }
         }
+    } catch (e: Exception) {
+        // Handle error
+    }
+    return emptyList()
+}
 
         return signatureList
     } catch (e: Exception) {
